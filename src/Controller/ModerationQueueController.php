@@ -60,4 +60,10 @@ class ModerationQueueController extends AbstractController
             'video_id' => $dailymotionVideoId,
         ], 200);
     }
+
+    #[Route('/log_video/{videoId}', methods: ['GET'])]
+    public function getLogs(int $videoId): JsonResponse
+    {
+        return new JsonResponse($this->moderationQueueService->getVideoLogs($videoId), 200);
+    }
 }
