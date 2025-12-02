@@ -43,4 +43,21 @@ class ModerationQueueController extends AbstractController
             'video_id' => $video->dailymotionVideoId,
         ], 201);
     }
+
+    #[Route('/get_video', methods: ['GET'])]
+    public function getVideo(Request $request): JsonResponse
+    {
+        $authHeader = $request->headers->get('Authorization', '') ?: "am9obi5kb2U=";
+        $moderatorName = base64_decode($authHeader);
+
+        $dailymotionVideoId = $this->moderationQueueService->getDailymotionVideoId($moderatorName);
+
+         if (!$dailymotionVideoId) {
+            return new JsonResponse(['message' => 'No videos in queue'], 422);
+        }
+
+        return new JsonResponse([
+            'video_id' => $dailymotionVideoId,
+        ], 200);
+    }
 }

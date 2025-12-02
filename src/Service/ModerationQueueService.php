@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\Dto\VideoDto;
-use App\Entity\ModerationLog;
+use App\Dto\ModerationLogDto;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -14,6 +14,27 @@ class ModerationQueueService
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
+    }
+
+    /**
+     * Add a new video to the moderation queue
+     */
+    public function addVideo(string $videoId)
+    {
+        $foundVideo = $this->findVideo($videoId);
+        if($foundVideo) {
+             return $foundVideo;
+        }
+
+        $createdVideo = $this->createVideo($videoId);
+        $this->createModerationLog($createdVideo->id);
+        return $createdVideo;
+    }
+
+    public function getDailymotionVideoId(string $moderator): ?string  {
+        $dailymotionVideoId = $this->getVideoId($moderator);
+        $this->createModerationLog(4, $moderator);
+        return $dailymotionVideoId;
     }
 
     private function findVideo(string $dailymotionVideoId): ?VideoDto {
@@ -41,32 +62,27 @@ class ModerationQueueService
         return new VideoDto($results["id"], $dailymotionVideoId);
     }
 
-    private function createInitialModerationLog(int $videoId) {
-        $sql = 'INSERT INTO moderation_logs (video_id) VALUES (:video_id) RETURNING id';
+    private function createModerationLog(int $videoId, string $moderator = null) {
+        $sql = 'INSERT INTO moderation_logs (video_id, moderator) VALUES (:video_id, :moderator) RETURNING id';
         $connexion = $this->entityManager->getConnection();
         $statement = $connexion->prepare($sql);
         $statement->bindValue('video_id', $videoId);
+        $statement->bindValue('moderator', $moderator);
         $results = $statement->executeQuery()->fetchAssociative();
         return new ModerationLogDto($results["id"], $videoId);
     }
 
-    /**
-     * Add a new video to the moderation queue
-     */
-    public function addVideo(string $videoId)
-    {
-        $foundVideo = $this->findVideo($videoId);
-        if($foundVideo) {
-             return $foundVideo;
-        }
-
-        $createdVideo = $this->createVideo($videoId);
-        $this->createInitialModerationLog($createdVideo->id);
-        return $createdVideo;
-    }
-
-    public function getVideo(string $moderator) {
-
+    private function getVideoId(string $moderator): ?string {
+        $sql = "SELECT videos.dailymotion_video_id
+                FROM moderation_logs INNER JOIN videos on moderation_logs.video_id = videos.id
+                WHERE (videos.status='pending' and moderator = :moderator) OR (videos.status = 'pending' and moderator is null)
+                ORDER BY videos.created_at DESC
+                LIMIT 1
+            ";
+        $connexion = $this->entityManager->getConnection();
+        $statement = $connexion->prepare($sql);
+        $statement->bindValue('moderator', $moderator);
+        return $statement->executeQuery()->fetchOne();
     }
 
 }
