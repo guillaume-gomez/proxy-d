@@ -38,10 +38,17 @@ class ModerationQueueService
         $statement = $connexion->prepare($sql);
         $statement->bindValue('dailymotion_video_id', $dailymotionVideoId);
         $results = $statement->executeQuery()->fetchAssociative();
-        return new VideoDto($results[":id"], $dailymotionVideoId);
+        return new VideoDto($results["id"], $dailymotionVideoId);
     }
 
-    // private function createLog()
+    private function createInitialModerationLog(int $videoId) {
+        $sql = 'INSERT INTO moderation_logs (video_id) VALUES (:video_id) RETURNING id';
+        $connexion = $this->entityManager->getConnection();
+        $statement = $connexion->prepare($sql);
+        $statement->bindValue('video_id', $videoId);
+        $results = $statement->executeQuery()->fetchAssociative();
+        return new ModerationLogDto($results["id"], $videoId);
+    }
 
     /**
      * Add a new video to the moderation queue
@@ -54,12 +61,9 @@ class ModerationQueueService
         }
 
         $createdVideo = $this->createVideo($videoId);
-        // TODO create first log on the video
+        $this->createInitialModerationLog($createdVideo->id);
         return $createdVideo;
     }
-
-
-
 
     public function getVideo(string $moderator) {
 
