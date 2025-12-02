@@ -24,7 +24,7 @@ final class Version20251202175302 extends AbstractMigration
             CREATE TABLE videos (
                 id SERIAL PRIMARY KEY,
                 dailymotion_video_id VARCHAR(10) UNIQUE NOT NULL,
-                status VARCHAR(10) DEFAULT 'PENDING',
+                status VARCHAR(10) DEFAULT 'pending',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )"
