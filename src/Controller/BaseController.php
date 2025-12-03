@@ -3,13 +3,11 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
+use App\Service\ValidatorService;
 
 class BaseController extends AbstractController {
 
     public function isVideoIdValid(string $dailymotionVideoId): bool {
-       $pattern = '/404$/';
-
-        return preg_match($pattern, $dailymotionVideoId);
+       return ValidatorService::isVideoIdValid($dailymotionVideoId);
     }
 }
