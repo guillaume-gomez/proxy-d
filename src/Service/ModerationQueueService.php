@@ -128,11 +128,12 @@ class ModerationQueueService
     }
 
     private function createModerationLog(string $videoId, ?string $moderator = null, string $status = VideoDto::STATUS_PENDING) {
-        $sql = 'INSERT INTO moderation_logs (video_id, moderator) VALUES (:video_id, :moderator) RETURNING id';
+        $sql = 'INSERT INTO moderation_logs (video_id, moderator, status) VALUES (:video_id, :moderator, :status) RETURNING id';
         $connexion = $this->entityManager->getConnection();
         $statement = $connexion->prepare($sql);
         $statement->bindValue('video_id', $videoId);
         $statement->bindValue('moderator', $moderator);
+        $statement->bindValue('status', $status);
         $results = $statement->executeQuery()->fetchAssociative();
         return new ModerationLogDto($results["id"], $videoId, $moderator, $status);
     }
