@@ -84,7 +84,7 @@ class ModerationQueueService
         $statement->bindValue('video_id', $videoId);
         $statement->bindValue('moderator', $moderator);
         $results = $statement->executeQuery()->fetchAssociative();
-        return new ModerationLogDto($results["id"], $videoId);
+        return new ModerationLogDto($results["id"], $videoId, $moderator);
     }
 
     private function getVideoId(string $moderator): ?string {

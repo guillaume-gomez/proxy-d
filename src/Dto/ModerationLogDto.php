@@ -11,6 +11,8 @@ class ModerationLogDto
         #[Assert\NotBlank(message: "Video ID is required")]
         public readonly int $videoId,
 
+        public ?string $moderator = null,
+
         #[Assert\Choice(
             choices: ['pending', 'spam', 'not_spam'],
             message: "Invalid video status"
@@ -18,7 +20,6 @@ class ModerationLogDto
         public string $status = VideoDto::STATUS_PENDING,
 
         #[Assert\NotNull(message: "Created timestamp is required")]
-        //private ?\DateTimeImmutable $createdAt = null,
         public $createdAt = null,
     ) {
         $this->createdAt = new \DateTimeImmutable($createdAt ? $createdAt : "");
