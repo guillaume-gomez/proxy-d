@@ -89,7 +89,7 @@ class ModerationQueueService
         $statement->bindValue('moderator', $moderator);
         $statement->bindValue('dailymotion_video_id', $dailymotionVideoId);
         $result = $statement->executeQuery()->fetchOne();
-        return $result;
+        return (bool) $result;
     }
 
     private function findVideo(string $dailymotionVideoId): ?VideoDto {
