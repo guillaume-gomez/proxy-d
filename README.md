@@ -68,10 +68,22 @@ curl -XGET 'http://localhost/log_video/VIDEO_ID'
 curl -XGET 'http://localhost/stats --header 'Token: am9obi5kb2U='
 ```
 
-### Few things for the moderator (user)
+## Few things for the moderator (user)
 - add a video create an initial log (logs allow to track changes made by moderator).
 - once moderator get a video, she needs to work on it until flag the video in spam or not_spam. Thats means /get_video will return the same video for a moderator until she flags it.
 - once a video is flagged by moderator, she could not change the status of the video (no more access)
 - /stats is available only for *admin* moderator with a token security encoded in base_64 `admin_token_dailymotion`
+
+## Architecture Schema
+<img width="1053" height="762" alt="Capture d’écran 2025-12-03 à 22 08 21" src="https://github.com/user-attachments/assets/bf56518b-aa13-4b47-ba5a-0b9f4d99db1b" />
+
+## Possible improvments
+- on the ModerationQueueService, the database layers is within the service. That could be interesting to create a service to store the queries.
+- DailymotionApiProxy and ModerationQueueService does not work together. One possible relation would be create a new video in the pool through ModerationQueueService::addVideo when a data is asked on DailymotionApiProxy.
+- Use redis to manage the cache.
+- Add more databases indexes depending on metrics during the deployment on production.
+- Clean up the docker configuration.
+- Clean up unused libs.
+-  maybe more :)
 
 
