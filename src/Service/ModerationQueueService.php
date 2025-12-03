@@ -46,7 +46,8 @@ class ModerationQueueService
     public function getVideoLogs(string $dailymotionVideoId): array {
         $sql = 'SELECT moderation_logs.created_at as "date", moderation_logs.status, moderation_logs.moderator
                 FROM moderation_logs
-                WHERE moderation_logs.video_id = :dailymotion_video_id';
+                WHERE moderation_logs.video_id = :dailymotion_video_id
+                ORDER BY moderation_logs.created_at ASC';
         $results = $this->connexion->executeQuery(
             $sql, ['dailymotion_video_id' => $dailymotionVideoId]
         )->fetchAllAssociative();
@@ -79,7 +80,8 @@ class ModerationQueueService
             return null;
         }
         $video = $this->updateStatusVideo($dailymotionVideoId, $status);
-        if($video->status !== VideoDto::STATUS_PENDING) {
+
+        if(!$video) {
             return null;
         }
 
@@ -127,13 +129,16 @@ class ModerationQueueService
     private function updateStatusVideo(string $dailymotionVideoId, string $status): ?VideoDto {
         $sql = 'UPDATE videos
                 SET status = :status
-                WHERE id = :dailymotion_video_id
+                WHERE id = :dailymotion_video_id AND status = :accepted_status
                 returning id, status, created_at as "createdAt"
                 ';
         $results = $this->connexion->executeQuery(
             $sql,
-            ['dailymotion_video_id' => $dailymotionVideoId, 'status' => $status]
+            ['dailymotion_video_id' => $dailymotionVideoId, 'status' => $status, 'accepted_status' => VideoDto::STATUS_PENDING]
         )->fetchAssociative();
+        if(!$results) {
+            return null;
+        }
         return new VideoDto(...$results);
     }
 
