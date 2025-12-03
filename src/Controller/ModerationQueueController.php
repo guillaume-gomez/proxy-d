@@ -8,10 +8,10 @@ use App\Service\ModerationQueueService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ModerationQueueController extends BaseController
 {
+    private const ADMIN_TOKEN = 'admin_token_dailymotion';
     private ModerationQueueService $moderationQueueService;
 
     public function __construct(ModerationQueueService $moderationQueueService)
@@ -103,13 +103,13 @@ class ModerationQueueController extends BaseController
     }
 
     #[Route('/stats', methods: ['GET'])]
-    public function getStats(): JsonResponse
+    public function getStats(Request $request): JsonResponse
     {
         $authHeader = $request->headers->get('Token', '');
         $token = base64_decode($authHeader);
 
         // todo make this string as an env. variable
-        if($token != "adminToken") {
+        if($token !== self::ADMIN_TOKEN) {
             return new JsonResponse(['message' => 'Not an admin'], 403);
         }
 
