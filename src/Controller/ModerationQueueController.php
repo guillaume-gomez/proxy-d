@@ -2,6 +2,8 @@
 // src/Controller/ModerationQueueController.php
 namespace App\Controller;
 
+
+use App\Dto\VideoDto;
 use App\Service\ModerationQueueService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -60,10 +62,17 @@ class ModerationQueueController extends BaseController
         }
 
         if (!isset($data['status'])) {
-            return new JsonResponse (['message' => 'status is required'], 400);
+            return new JsonResponse (['message' => 'Status is required'], 400);
+        }
+
+        if(!in_array($data['status'], [VideoDto::STATUS_SPAM, VideoDto::STATUS_NOT_SPAM]) ) {
+            return new JsonResponse (['message' => 'Invalid status'], 422);
         }
 
         $video = $this->moderationQueueService->flagVideo($data['video_id'], $data['status'], $moderatorName);
+        if(!$video) {
+            return new JsonResponse (['message' => 'Cannot managed this video'], 403);
+        }
 
         return new JsonResponse([
             'video_id' => $video->id,

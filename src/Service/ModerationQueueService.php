@@ -70,11 +70,19 @@ class ModerationQueueService
     }
 
     public function flagVideo(string $dailymotionVideoId, string $status, string $moderator): ?VideoDto {
+        // check already done in controller, but this service could be use elsewhere
+        if(!in_array($status, [VideoDto::STATUS_SPAM, VideoDto::STATUS_NOT_SPAM]) ) {
+            return null;
+        }
+
         if(!$this->canModeratorManage($dailymotionVideoId, $moderator)) {
             return null;
         }
-        //TODO check if status value is valid
         $video = $this->updateStatusVideo($dailymotionVideoId, $status);
+        if($video->status !== VideoDto::STATUS_PENDING) {
+            return null;
+        }
+
         $this->createModerationLog($video->id, $moderator, $status);
 
         return $video;
