@@ -23,7 +23,7 @@ class ModerationQueueService
     {
         $foundVideo = $this->findVideo($videoId);
         if($foundVideo) {
-             return $foundVideo;
+            return $foundVideo;
         }
 
         $createdVideo = $this->createVideo($videoId);
@@ -33,6 +33,9 @@ class ModerationQueueService
 
     public function getDailymotionVideoId(string $moderator): ?string  {
         $dailymotionVideoId = $this->getVideoId($moderator);
+        if(!$dailymotionVideoId) {
+            return null;
+        }
         $this->createModerationLog($dailymotionVideoId, $moderator);
         return $dailymotionVideoId;
     }
@@ -68,7 +71,7 @@ class ModerationQueueService
 
     public function flagVideo(string $dailymotionVideoId, string $status, string $moderator): ?VideoDto {
         if(!$this->canModeratorManage($dailymotionVideoId, $moderator)) {
-             return false;
+            return null;
         }
         //TODO check if status value is valid
         $video = $this->updateStatusVideo($dailymotionVideoId, $status);
@@ -85,8 +88,8 @@ class ModerationQueueService
         $statement = $connexion->prepare($sql);
         $statement->bindValue('moderator', $moderator);
         $statement->bindValue('dailymotion_video_id', $dailymotionVideoId);
-        $results = $statement->executeQuery()->fetchOne();
-        return isset($results);
+        $result = $statement->executeQuery()->fetchOne();
+        return $result;
     }
 
     private function findVideo(string $dailymotionVideoId): ?VideoDto {
