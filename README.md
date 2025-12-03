@@ -1,4 +1,4 @@
-## Daymotion Proxy
+## Dailymotion Proxy
 
 ## Install
 
