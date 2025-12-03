@@ -30,7 +30,7 @@ docker-compose exec --env=test php bin/phpunit
 ```
 
 ## Try it locally
-few curls commands
+few Curl commands
 
 - get a video
 ```
@@ -42,14 +42,14 @@ curl 'http://localhost/get_video' \
 
 - add a video on the pool
 ```
-curl -XPOST 'http://localhost/add_video' -d '{ "video_id": 123456 }'
+curl -XPOST 'http://localhost/add_video' -d '{ "video_id": VIDEO_ID }'
 ```
 
 - flag a video
 ```
-curl -XPOST 'http://localhost/flag_video' -d '{ "video_id" : "456XJKLJKL", "status": "not spam" }'  --header 'Authorization: am9obi5kb2U='
+curl -XPOST 'http://localhost/flag_video' -d '{ "video_id" : VIDEO_ID, "status": "spam"|"not_spam" }'  --header 'Authorization: am9obi5kb2U='
 ```
 - get video info from the proxy server
 ```
- curl http://localhost/get_video_info/787987
+ curl http://localhost/get_video_info/VIDEO_ID
  ```
