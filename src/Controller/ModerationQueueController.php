@@ -66,4 +66,10 @@ class ModerationQueueController extends AbstractController
     {
         return new JsonResponse($this->moderationQueueService->getVideoLogs($dailymotionVideoId), 200);
     }
+
+    #[Route('/stats', methods: ['GET'])]
+    public function getStats(): JsonResponse
+    {
+        return new JsonResponse($this->moderationQueueService->getStats(), 200);
+    }
 }

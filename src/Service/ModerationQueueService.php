@@ -52,6 +52,20 @@ class ModerationQueueService
         return $results;
     }
 
+    // TODO OPTIMISE
+    public function getStats() : array {
+        $sql = "SELECT 
+                COUNT(CASE WHEN status = 'pending' THEN 1 END) AS total_pending_videos,
+                COUNT(CASE WHEN status = 'spam' THEN 1 END) AS total_spam_videos,
+                COUNT(CASE WHEN status = 'not_spam' THEN 1 END) AS total_not_spam_videos
+                FROM videos;
+            ";
+        $connexion = $this->entityManager->getConnection();
+        $statement = $connexion->prepare($sql);
+        $results = $statement->executeQuery()->fetchAllAssociative();
+        return $results;
+    }
+
     private function findVideo(string $dailymotionVideoId): ?VideoDto {
         $sql = 'SELECT id, dailymotion_video_id as "dailymotionVideoId", status, created_at as "createdAt", updated_at as "updatedAt"
         FROM videos WHERE videos.dailymotion_video_id = :dailymotion_video_id
