@@ -37,7 +37,7 @@ class ModerationQueueService
         return $dailymotionVideoId;
     }
 
-    public function getVideoLogs(int $dailymotionVideoId): array {
+    public function getVideoLogs(string $dailymotionVideoId): array {
         $sql = 'SELECT moderation_logs.created_at as "date", moderation_logs.status, moderation_logs.moderator
                 FROM moderation_logs INNER JOIN videos on moderation_logs.video_id = videos.id
                 WHERE videos.dailymotion_video_id = :dailymotion_video_id';
