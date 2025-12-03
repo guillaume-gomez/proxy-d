@@ -19,15 +19,6 @@ class ModerationQueueController extends BaseController
         $this->moderationQueueService = $moderationQueueService;
     }
 
-    #[Route('/lucky/number', methods: ['GET'])]
-    public function number(): JsonResponse
-    {
-        $result = $this->moderationQueueService->addVideo("xs2m8jpp");
-        return new JsonResponse([
-            'video_id' => $result,
-        ], 201);
-    }
-
     #[Route('/add_video', methods: ['POST'])]
     public function addVideo(Request $request): JsonResponse
     {

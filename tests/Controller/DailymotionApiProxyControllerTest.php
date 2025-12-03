@@ -67,7 +67,7 @@ class DailymotionApiProxyControllerTest extends WebTestCase
 
     public function testGetVideoInfoWithServiceError()
     {
-        $videoId = 'xs2m8jpp';
+        $videoId = 'AAAAAAAA';
         $errorResponse = ['error' => 'API Error: Video not found'];
 
         $this->apiProxyService->expects($this->once())
