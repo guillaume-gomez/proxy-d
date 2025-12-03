@@ -78,6 +78,7 @@ curl -XGET 'http://localhost/stats --header 'Token: am9obi5kb2U='
 <img width="1053" height="762" alt="Capture d’écran 2025-12-03 à 22 08 21" src="https://github.com/user-attachments/assets/bf56518b-aa13-4b47-ba5a-0b9f4d99db1b" />
 
 ## Possible improvments
+- I didn't not manage to test the dailymotion API (SSL error)
 - on the ModerationQueueService, the database layers is within the service. That could be interesting to create a service to store the queries.
 - DailymotionApiProxy and ModerationQueueService does not work together. One possible relation would be create a new video in the pool through ModerationQueueService::addVideo when a data is asked on DailymotionApiProxy.
 - Use redis to manage the cache.
