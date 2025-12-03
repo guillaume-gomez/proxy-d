@@ -9,7 +9,7 @@ class ModerationLogDto
         public readonly ?int $id = null,
 
         #[Assert\NotBlank(message: "Video ID is required")]
-        public readonly int $videoId,
+        public readonly string $videoId,
 
         public ?string $moderator = null,
 

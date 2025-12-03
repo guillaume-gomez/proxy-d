@@ -24,7 +24,7 @@ final class Version20251202210415 extends AbstractMigration
             "
             CREATE TABLE moderation_logs (
                 id SERIAL PRIMARY KEY,
-                video_id INT NOT NULL,
+                video_id VARCHAR(10) NOT NULL,
                 status VARCHAR(10) DEFAULT 'pending',
                 moderator VARCHAR(100),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

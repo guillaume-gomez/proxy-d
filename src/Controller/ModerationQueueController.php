@@ -18,15 +18,14 @@ class ModerationQueueController extends AbstractController
         $this->moderationQueueService = $moderationQueueService;
     }
 
-    // #[Route('/lucky/number', methods: ['GET'])]
-    //   public function number(): JsonResponse
-    //   {
-    //     $result = $this->moderationQueueService->addVideo("xs2m8jpp");
-    //     return new JsonResponse([
-    //         'video_id' => $result,
-    //         'status' => "jkj"
-    //     ], 201);
-    //   }
+    #[Route('/lucky/number', methods: ['GET'])]
+      public function number(): JsonResponse
+      {
+        $result = $this->moderationQueueService->addVideo("xs2m8jpp");
+        return new JsonResponse([
+            'video_id' => $result,
+        ], 201);
+      }
 
     #[Route('/add_video', methods: ['POST'])]
     public function addVideo(Request $request): JsonResponse
@@ -40,15 +39,36 @@ class ModerationQueueController extends AbstractController
         $video = $this->moderationQueueService->addVideo($data['video_id']);
 
         return new JsonResponse([
-            'video_id' => $video->dailymotionVideoId,
+            'video_id' => $video->id,
+        ], 201);
+    }
+
+    #[Route('/flag_video', methods: ['POST'])]
+    public function flagVideo(Request $request): JsonResponse
+    {
+        $moderatorName = $this->authenticated($request);
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['video_id'])) {
+            return new JsonResponse (['message' => 'Video ID is required'], 400);
+        }
+
+        if (!isset($data['status'])) {
+            return new JsonResponse (['message' => 'status is required'], 400);
+        }
+
+        $video = $this->moderationQueueService->flagVideo($data['video_id'], $data['status'], $moderatorName);
+
+        return new JsonResponse([
+            'video_id' => $video->id,
+            'status' => $video->status
         ], 201);
     }
 
     #[Route('/get_video', methods: ['GET'])]
     public function getVideo(Request $request): JsonResponse
     {
-        $authHeader = $request->headers->get('Authorization', '') ?: "am9obi5kb2U=";
-        $moderatorName = base64_decode($authHeader);
+        $moderatorName = $this->authenticated($request);
 
         $dailymotionVideoId = $this->moderationQueueService->getDailymotionVideoId($moderatorName);
 
@@ -71,5 +91,17 @@ class ModerationQueueController extends AbstractController
     public function getStats(): JsonResponse
     {
         return new JsonResponse($this->moderationQueueService->getStats(), 200);
+    }
+
+    private function authenticated(Request $request) {
+        // remove or condition
+        $authHeader = $request->headers->get('Authorization', '') ?: "am9obi5kb2U=";
+        $moderatorName = base64_decode($authHeader);
+
+        if(!isset($moderatorName)) {
+            throw new BadRequestHttpException('Not authenticated');
+        }
+
+        return $moderatorName;
     }
 }

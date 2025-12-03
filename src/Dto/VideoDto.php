@@ -11,10 +11,8 @@ class VideoDto
 
 
     public function __construct(
-        public readonly ?int $id = null,
-
         #[Assert\NotBlank(message: "Video ID is required")]
-        public readonly string $dailymotionVideoId,
+        public readonly ?string $id = null,
 
         #[Assert\Choice(
             choices: ['pending', 'spam', 'not_spam'],
