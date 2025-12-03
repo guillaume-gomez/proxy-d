@@ -220,7 +220,6 @@ class ModerationQueueServiceTest extends KernelTestCase
         );
 
         $video = $this->service->flagVideo($dailymotionVideoId, $status, $moderator);
-
         $this->assertInstanceOf(VideoDto::class, $video);
         $this->assertEquals($dailymotionVideoId, $video->id);
         $this->assertEquals($status, $video->status);
