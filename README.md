@@ -68,15 +68,10 @@ curl -XGET 'http://localhost/log_video/VIDEO_ID'
 curl -XGET 'http://localhost/stats --header 'Token: am9obi5kb2U='
 ```
 
-- get video info from the proxy server
-```
- curl http://localhost/get_video_info/VIDEO_ID
- ```
-
 ### Few things for the moderator (user)
 - add a video create an initial log (logs allow to track changes made by moderator).
 - once moderator get a video, she needs to work on it until flag the video in spam or not_spam. Thats means /get_video will return the same video for a moderator until she flags it.
-- once a video is flagged by moderator, she could not change the status of the video (not more access)
+- once a video is flagged by moderator, she could not change the status of the video (no more access)
 - /stats is available only for *admin* moderator with a token security encoded in base_64 `admin_token_dailymotion`
 
 
