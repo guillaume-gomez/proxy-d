@@ -37,20 +37,19 @@ class ModerationQueueService
         return $dailymotionVideoId;
     }
 
-    public function getVideoLogs($dailymotionVideoId): array {
-        $sql = 'SELECT moderation_logs.id, moderation_logs.video_id as "videoId", moderation_logs.status, moderation_logs.moderator, moderation_logs.created_at as "createdAt"
+    public function getVideoLogs(int $dailymotionVideoId): array {
+        $sql = 'SELECT moderation_logs.created_at as "date", moderation_logs.status, moderation_logs.moderator
                 FROM moderation_logs INNER JOIN videos on moderation_logs.video_id = videos.id
                 WHERE videos.dailymotion_video_id = :dailymotion_video_id';
         $connexion = $this->entityManager->getConnection();
         $statement = $connexion->prepare($sql);
         $statement->bindValue('dailymotion_video_id', $dailymotionVideoId);
-        $results = $statement->executeQuery()->fetchAssociative();
+        $results = $statement->executeQuery()->fetchAllAssociative();
 
         if (!$results) {
             return [];
         }
-
-        return new ModerationLogDto(...$results);
+        return $results;
     }
 
     private function findVideo(string $dailymotionVideoId): ?VideoDto {
