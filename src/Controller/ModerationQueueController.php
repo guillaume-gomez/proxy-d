@@ -3,13 +3,12 @@
 namespace App\Controller;
 
 use App\Service\ModerationQueueService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class ModerationQueueController extends AbstractController
+class ModerationQueueController extends BaseController
 {
     private ModerationQueueService $moderationQueueService;
 
@@ -19,13 +18,13 @@ class ModerationQueueController extends AbstractController
     }
 
     #[Route('/lucky/number', methods: ['GET'])]
-      public function number(): JsonResponse
-      {
+    public function number(): JsonResponse
+    {
         $result = $this->moderationQueueService->addVideo("xs2m8jpp");
         return new JsonResponse([
             'video_id' => $result,
         ], 201);
-      }
+    }
 
     #[Route('/add_video', methods: ['POST'])]
     public function addVideo(Request $request): JsonResponse
@@ -33,7 +32,10 @@ class ModerationQueueController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         if (!isset($data['video_id'])) {
-            throw new BadRequestHttpException('Video ID is required');
+            return new JsonResponse(['message' => 'Video ID is required'], 400);
+        }
+        if($this->isVideoIdValid($data['video_id'])) {
+            return new JsonResponse(['message' => 'Invalid video id'], 422);
         }
 
         $video = $this->moderationQueueService->addVideo($data['video_id']);
@@ -51,6 +53,10 @@ class ModerationQueueController extends AbstractController
 
         if (!isset($data['video_id'])) {
             return new JsonResponse (['message' => 'Video ID is required'], 400);
+        }
+
+        if($this->isVideoIdValid($data['video_id'])) {
+            return new JsonResponse(['message' => 'Invalid video id'], 422);
         }
 
         if (!isset($data['status'])) {
@@ -90,16 +96,23 @@ class ModerationQueueController extends AbstractController
     #[Route('/stats', methods: ['GET'])]
     public function getStats(): JsonResponse
     {
+        $authHeader = $request->headers->get('Token', '');
+        $token = base64_decode($authHeader);
+
+        // todo make this string as an env. variable
+        if($token != "adminToken") {
+            return new JsonResponse(['message' => 'Not an admin'], 403);
+        }
+
         return new JsonResponse($this->moderationQueueService->getStats(), 200);
     }
 
     private function authenticated(Request $request) {
-        // remove or condition
-        $authHeader = $request->headers->get('Authorization', '') ?: "am9obi5kb2U=";
+        $authHeader = $request->headers->get('Authorization', '');
         $moderatorName = base64_decode($authHeader);
 
         if(!isset($moderatorName)) {
-            throw new BadRequestHttpException('Not authenticated');
+            throw new JsonResponse (['message' => 'Not authenticated'], 403);
         }
 
         return $moderatorName;
